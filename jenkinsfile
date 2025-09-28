@@ -1,8 +1,11 @@
 pipeline {
-    agent { label 'slave-node-agent' }
+    agent any
 
     environment {
         IMAGE_NAME = "my-nginx"
+        IMAGE_TAG = "1.19"
+        CONTAINER_NAME = "nginx-old"
+        PORT_MAPPING = "8080:80"
     }
 
     stages {
@@ -15,18 +18,20 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    dockerImage = docker.build("${IMAGE_NAME}:1.19")
+                    dockerImage = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
                 }
             }
         }
 
         stage('Deploy Container') {
             steps {
-                sh """
-                docker stop nginx-old || true
-                docker rm nginx-old || true
-                docker run -d --name nginx-old -p 8080:80 ${IMAGE_NAME}:1.19
-                """
+                script {
+                    sh """
+                        docker stop ${CONTAINER_NAME} || true
+                        docker rm ${CONTAINER_NAME} || true
+                        docker run -d --name ${CONTAINER_NAME} -p ${PORT_MAPPING} ${IMAGE_NAME}:${IMAGE_TAG}
+                    """
+                }
             }
         }
     }
