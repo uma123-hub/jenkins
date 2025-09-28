@@ -5,7 +5,7 @@ pipeline {
         IMAGE_NAME = "my-nginx"
         IMAGE_TAG = "1.19"
         CONTAINER_NAME = "nginx-old"
-        PORT_MAPPING = "8080:80"
+        PORT_MAPPING = "8181:81"
     }
 
     stages {
